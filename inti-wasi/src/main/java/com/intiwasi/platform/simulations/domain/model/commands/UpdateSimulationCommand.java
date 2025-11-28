@@ -1,0 +1,51 @@
+package com.intiwasi.platform.simulations.domain.model.commands;
+
+import com.intiwasi.platform.simulations.domain.model.valueobjects.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
+public record UpdateSimulationCommand(
+        Long simulationId,
+        ProgramaHabitacional programName,
+        Currency currency,
+        String fullName,
+        String dni,
+        LocalDate birthDate,
+        String email,
+        String phoneNumber,
+        String address,
+        CivilStatus civilStatus,
+        Integer dependents,
+        JobType jobType,
+        Integer jobMonths,
+        IncomeProof incomeProof,
+        BigDecimal monthlyIncome,
+        BigDecimal spouseIncomes,
+        Boolean hasCurrentDebt,
+        BigDecimal totalMonthlyDebtPayments,
+        Boolean negativeRecordSbs,
+        Boolean hasOtherProperty,
+        Boolean receivedBonoBeforeFMV,
+        TypeBond typeBond,
+        String propertyName,
+        String propertyLocation,
+        String propertyDepartment,
+        String propertyDistrict,
+        PropertyType propertyType,
+        BigDecimal propertyPrice,
+        Boolean isPropertySustainable,
+        Boolean hasDownPayment,
+        BigDecimal percentageDownPayment,
+        FinancialInstitution financialInstitution,
+        Integer deadlinesMonths,
+        String typeRate,
+        BigDecimal interestRate,
+        Capitalization capitalization,
+        BigDecimal monthlyCommissions,
+        BigDecimal mortgageInsuranceRate,
+        BigDecimal propertyInsurance,
+        GracePeriodType gracePeriodType,
+        Integer gracePeriodMonths,
+        LocalDate dayOfPayment
+) {}
