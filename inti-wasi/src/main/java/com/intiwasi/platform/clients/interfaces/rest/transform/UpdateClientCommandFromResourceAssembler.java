@@ -17,23 +17,6 @@ public class UpdateClientCommandFromResourceAssembler {
                 new EmailAddress(resource.email()),
                 new PhoneNumber(resource.phone()),
                 resource.monthlyIncome()
-                /*
-                resource.birthDate(),
-                resource.civilStatus(),
-                resource.district(),
-                resource.dependents(),
-                resource.currency(),
-                resource.jobType(),
-                resource.jobMonths(),
-                resource.incomeProof(),
-                resource.monthlyIncome(),
-                resource.spouseIncome(),
-                resource.firstHome(),
-                resource.hasOtherProperty(),
-                resource.receivedBonoBefore(),
-                resource.desiredSubsidy()
-                */
-
         );
     }
 }

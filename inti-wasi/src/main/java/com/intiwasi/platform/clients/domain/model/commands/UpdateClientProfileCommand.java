@@ -15,17 +15,4 @@ public record UpdateClientProfileCommand(
         EmailAddress email,
         PhoneNumber phone,
         Double monthlyIncome
-        /*LocalDate birthDate,
-        String civilStatus,
-        String district,
-        Integer dependents,
-        String currency,
-        String jobType,
-        Integer jobMonths,
-        String incomeProof,
-        Double spouseIncome,
-        Boolean firstHome,
-        Boolean hasOtherProperty,
-        Boolean receivedBonoBefore,
-        String desiredSubsidy*/
 ) {}

@@ -1,8 +1,7 @@
 package com.intiwasi.platform.iam.domain.services;
 
-import com.intiwasi.platform.iam.domain.model.entities.Role;
 import com.intiwasi.platform.iam.domain.model.queries.GetAllRolesQuery;
-import com.intiwasi.platform.iam.domain.model.queries.GetRoleByNameQuery;
+import com.intiwasi.platform.iam.domain.model.valueobjects.Roles;
 
 import java.util.List;
 import java.util.Optional;
@@ -14,17 +13,17 @@ import java.util.Optional;
  * </p>
  */
 public interface RoleQueryService {
-    /**
-     * Handle get all roles query
-     * @param query the {@link GetAllRolesQuery} query
-     * @return a list of {@link Role} entities
-     */
-    List<Role> handle(GetAllRolesQuery query);
-
-    /**
-     * Handle get role by name query
-     * @param query the {@link GetRoleByNameQuery} query
-     * @return an {@link Optional} of {@link Role} entity
-     */
-    Optional<Role> handle(GetRoleByNameQuery query);
+//    /**
+//     * Handle get all roles query
+//     * @param query the {@link GetAllRolesQuery} query
+//     * @return a list of {@link Role} entities
+//     */
+//    List<Roles> handle(GetAllRolesQuery query);
+//
+//    /**
+//     * Handle get role by name query
+//     * @param query the {@link GetRoleByNameQuery} query
+//     * @return an {@link Optional} of {@link Role} entity
+//     */
+//    Optional<Roles> handle(GetRoleByNameQuery query);
 }

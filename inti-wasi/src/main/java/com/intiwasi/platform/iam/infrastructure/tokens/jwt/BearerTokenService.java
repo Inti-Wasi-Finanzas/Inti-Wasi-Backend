@@ -25,4 +25,7 @@ public interface BearerTokenService extends TokenService {
      * @see Authentication
      */
     String generateToken(Authentication authentication);
+
+    String generateToken(String username);
+
 }

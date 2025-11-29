@@ -1,9 +1,9 @@
 package com.intiwasi.platform.iam.interfaces.acl;
 
 import com.intiwasi.platform.iam.domain.model.commands.SignUpCommand;
-import com.intiwasi.platform.iam.domain.model.entities.Role;
 import com.intiwasi.platform.iam.domain.model.queries.GetUserByIdQuery;
 import com.intiwasi.platform.iam.domain.model.queries.GetUserByUsernameQuery;
+import com.intiwasi.platform.iam.domain.model.valueobjects.Roles;
 import com.intiwasi.platform.iam.domain.services.UserCommandService;
 import com.intiwasi.platform.iam.domain.services.UserQueryService;
 import org.apache.logging.log4j.util.Strings;
@@ -36,7 +36,7 @@ public class IamContextFacade {
      * @return The id of the created user.
      */
     public Long createUser(String username, String password) {
-        var signUpCommand = new SignUpCommand(username, password, List.of(Role.getDefaultRole()));
+        var signUpCommand = new SignUpCommand(username, password, Roles.ROLE_CLIENT); // Default role
         var result = userCommandService.handle(signUpCommand);
         if (result.isEmpty()) return 0L;
         return result.get().getId();
@@ -50,7 +50,7 @@ public class IamContextFacade {
      * @return The id of the created user.
      */
     public Long createUser(String username, String password, List<String> roleNames) {
-        var roles = roleNames != null ? roleNames.stream().map(Role::toRoleFromName).toList() : new ArrayList<Role>();
+        var roles = roleNames != null && !roleNames.isEmpty() ? Roles.valueOf(roleNames.get(0)) : Roles.ROLE_CLIENT;
         var signUpCommand = new SignUpCommand(username, password, roles);
         var result = userCommandService.handle(signUpCommand);
         if (result.isEmpty()) return 0L;

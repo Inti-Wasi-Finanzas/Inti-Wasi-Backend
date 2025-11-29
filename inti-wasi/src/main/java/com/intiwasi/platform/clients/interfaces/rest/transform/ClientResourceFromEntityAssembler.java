@@ -15,15 +15,6 @@ public class ClientResourceFromEntityAssembler {
                 client.getEmail() != null ? client.getEmail().value() : null,
                 client.getPhone() != null ? client.getPhone().value() : null,
                 client.getMonthlyIncome()
-                /*
-                client.getBirthDate(),
-                client.getCivilStatus(),
-                client.getDistrict(),
-                client.getDependents(),
-                client.getCurrency(),
-                client.getTotalFamilyIncome(),
-                client.getDesiredSubsidy()
-                 */
         );
     }
 }

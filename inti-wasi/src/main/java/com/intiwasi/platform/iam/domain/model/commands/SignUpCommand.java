@@ -1,8 +1,6 @@
 package com.intiwasi.platform.iam.domain.model.commands;
 
-import com.intiwasi.platform.iam.domain.model.entities.Role;
-
-import java.util.List;
+import com.intiwasi.platform.iam.domain.model.valueobjects.Roles;
 
 /**
  * Sign up command
@@ -15,5 +13,5 @@ import java.util.List;
  *
  * @see com.acme.center.platform.iam.domain.model.aggregates.User
  */
-public record SignUpCommand(String username, String password, List<Role> roles) {
+public record SignUpCommand(String username, String password, Roles role) {
 }

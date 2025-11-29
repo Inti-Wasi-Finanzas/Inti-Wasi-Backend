@@ -8,11 +8,4 @@ public record ClientResource(
         String phone,
         Double monthlyIncome
 
-        //LocalDate birthDate,
-        //String civilStatus,
-        //String district,
-        //Integer dependents,
-        //String currency,
-        //Double totalFamilyIncome,
-        //String desiredSubsidy
 ) {}

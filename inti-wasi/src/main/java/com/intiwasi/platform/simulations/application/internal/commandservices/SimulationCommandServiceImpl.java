@@ -45,8 +45,7 @@ public class SimulationCommandServiceImpl implements SimulationCommandService {
         if (c.advisorId() != null) {
             var advisor = userRepository.findById(c.advisorId())
                     .orElseThrow(() -> new IllegalArgumentException("Advisor not found"));
-            boolean isAdvisor = advisor.getRoles().stream()
-                    .anyMatch(role -> role.getName() == Roles.ROLE_ADVISOR);
+            boolean isAdvisor = advisor.getRole() == Roles.ROLE_ADVISOR;
             if (!isAdvisor) {
                 throw new IllegalArgumentException("User is not an advisor");
             }
@@ -378,8 +377,7 @@ public class SimulationCommandServiceImpl implements SimulationCommandService {
 
         var advisor = userRepository.findById(c.advisorId())
                 .orElseThrow(() -> new IllegalArgumentException("Advisor not found"));
-        boolean isAdvisor = advisor.getRoles().stream()
-                .anyMatch(role -> role.getName() == Roles.ROLE_ADVISOR);
+        boolean isAdvisor = advisor.getRole() == Roles.ROLE_ADVISOR;
         if (!isAdvisor) {
             throw new IllegalArgumentException("User is not an advisor");
         }
@@ -396,8 +394,7 @@ public class SimulationCommandServiceImpl implements SimulationCommandService {
 
         var advisor = userRepository.findById(c.advisorId())
                 .orElseThrow(() -> new IllegalArgumentException("Advisor not found"));
-        boolean isAdvisor = advisor.getRoles().stream()
-                .anyMatch(role -> role.getName() == Roles.ROLE_ADVISOR);
+        boolean isAdvisor = advisor.getRole() == Roles.ROLE_ADVISOR;
         if (!isAdvisor) {
             throw new IllegalArgumentException("User is not an advisor");
         }

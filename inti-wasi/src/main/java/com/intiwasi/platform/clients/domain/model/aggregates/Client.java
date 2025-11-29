@@ -34,31 +34,6 @@ public class Client extends AuditableAbstractAggregateRoot<Client> {
     private PhoneNumber phone;
 
     private Double monthlyIncome;
-
-    /*
-    private LocalDate birthDate;
-
-    @Column(length = 20)
-    private String civilStatus;
-
-    private String district;
-
-    private Integer dependents;
-
-    @Column(length = 10)
-    private String currency; // "SOLES", "DOLARES"
-
-    private String jobType;
-    private Integer jobMonths;
-    private String incomeProof;
-    private Double monthlyIncome;
-    private Double spouseIncome;
-    private Double totalFamilyIncome;
-    private Boolean firstHome;
-    private Boolean hasOtherProperty;
-    private Boolean receivedBonoBefore;
-    private String desiredSubsidy;
-    */
     public Client() {
         this.fullName = new PersonName("Sin nombre");
         this.dni = new Dni("00000000");
