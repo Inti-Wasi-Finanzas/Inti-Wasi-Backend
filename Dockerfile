@@ -1,28 +1,29 @@
-# ===== Etapa de build =====
+# Etapa de build
 FROM eclipse-temurin:25-jdk AS build
 WORKDIR /app
 
-# Copiamos todo el proyecto
+# Copiamos todo el proyecto al contenedor
 COPY . .
 
-# Nos movemos a la carpeta donde está mvnw y pom.xml
-WORKDIR /app/inti-wasi
-
-# Damos permisos y compilamos
+# Damos permisos de ejecución al wrapper de Maven
 RUN chmod +x mvnw
+
+# Compilamos el proyecto (sin tests)
 RUN ./mvnw clean package -DskipTests
 
-# ===== Etapa de runtime =====
+# Etapa de runtime
 FROM eclipse-temurin:25-jre AS runtime
 WORKDIR /app
 
-# Copiamos el JAR generado
-COPY --from=build /app/inti-wasi/target/*.jar app.jar
+# Copiamos el JAR generado desde la etapa de build
+COPY --from=build /app/target/*.jar app.jar
 
-# Copiamos wait-for-it.sh
+# Copiamos wait-for-it.sh y damos permisos
 COPY wait-for-it.sh /app/wait-for-it.sh
 RUN chmod +x /app/wait-for-it.sh
 
+# Exponemos el puerto que usa Spring Boot
 EXPOSE 8080
 
+# Espera a que MySQL esté listo antes de arrancar la app
 ENTRYPOINT ["/app/wait-for-it.sh", "mysql:3306", "--", "java", "-jar", "app.jar"]
