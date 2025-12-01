@@ -4,6 +4,7 @@ import com.intiwasi.platform.iam.infrastructure.authorization.sfs.pipeline.Beare
 import com.intiwasi.platform.iam.infrastructure.hashing.bcrypt.BCryptHashingService;
 import com.intiwasi.platform.iam.infrastructure.tokens.jwt.BearerTokenService;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value; // Importación necesaria
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -19,7 +20,9 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Web Security Configuration.
@@ -34,38 +37,34 @@ import java.util.List;
 public class WebSecurityConfiguration {
 
     private final UserDetailsService userDetailsService;
-
     private final BearerTokenService tokenService;
-
     private final BCryptHashingService hashingService;
-
     private final AuthenticationEntryPoint unauthorizedRequestHandler;
 
-    /**
-     * This method creates the Bearer Authorization Request Filter.
-     * @return The Bearer Authorization Request Filter
-     * @see BearerAuthorizationRequestFilter
-     */
+    // INYECCIÓN DE VARIABLES DE ENTORNO PARA CORS Y SWAGGER
+    @Value("${CORS_ALLOWED_ORIGINS:*}") // Origen permitido, usa '*' como fallback
+    private String corsAllowedOrigins;
+    
+    @Value("${ENABLE_SWAGGER:true}") // Controla si Swagger está habilitado
+    private boolean enableSwagger;
+    
+    public WebSecurityConfiguration(@Qualifier("defaultUserDetailsService") UserDetailsService userDetailsService, BearerTokenService tokenService, BCryptHashingService hashingService, AuthenticationEntryPoint authenticationEntryPoint) {
+        this.userDetailsService = userDetailsService;
+        this.tokenService = tokenService;
+        this.hashingService = hashingService;
+        this.unauthorizedRequestHandler = authenticationEntryPoint;
+    }
+
     @Bean
     public BearerAuthorizationRequestFilter authorizationRequestFilter() {
         return new BearerAuthorizationRequestFilter(tokenService, userDetailsService);
     }
 
-    /**
-     * This method creates the authentication manager.
-     * @param authenticationConfiguration The {@link AuthenticationConfiguration} object with the authentication configuration
-     * @return The {@link AuthenticationManager} instance from the authentication configuration
-     *
-     */
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
-    /**
-     * This method creates the authentication provider.
-     * @return The {@link DaoAuthenticationProvider} authentication provider with the user details service and the password encoder
-     */
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
         var authenticationProvider = new DaoAuthenticationProvider();
@@ -74,63 +73,69 @@ public class WebSecurityConfiguration {
         return authenticationProvider;
     }
 
-    /**
-     * This method creates the password encoder.
-     * @return The {@link PasswordEncoder} instance with the hashing service
-     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return hashingService;
     }
 
-    /**
-     * This method creates the security filter chain.
-     * It also configures the http security.
-     *
-     * @param http The {@link HttpSecurity} object to configure with the security filter chain
-     * @return The {@link SecurityFilterChain} instance with the application http security configuration
-     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        // --- CONFIGURACIÓN DE CORS OPTIMIZADA ---
         http.cors(configurer -> configurer.configurationSource(_ -> {
             var cors = new CorsConfiguration();
-            cors.setAllowedOrigins(List.of("*"));
+            
+            // Si la variable de entorno es "*", permite todos. 
+            // Si es una lista separada por comas, la parsea.
+            if ("*".equals(corsAllowedOrigins)) {
+                cors.setAllowedOrigins(List.of("*"));
+            } else {
+                List<String> origins = Arrays.stream(corsAllowedOrigins.split(","))
+                        .map(String::trim)
+                        .collect(Collectors.toList());
+                cors.setAllowedOrigins(origins);
+            }
+            
             cors.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
             cors.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
+            cors.setAllowCredentials(true); // Necesario si usa cookies/sesiones (aunque aquí no)
             return cors;
         }));
+        // ----------------------------------------
+
         http.csrf(csrfConfigurer -> csrfConfigurer.disable())
                 .exceptionHandling(exceptionHandling -> exceptionHandling.authenticationEntryPoint(unauthorizedRequestHandler))
-                .sessionManagement( customizer -> customizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(authorizeRequests -> authorizeRequests
-                        .requestMatchers(
-                                "/api/v1/authentication/**", //ultimo cambio
-                                "/api/auth/authentication/**", // para render
-                                "/api/v1/authentication/sign-in",
-                                "/api/v1/authentication/sign-up",
-                                "/v3/api-docs/**",
-                                "/swagger-ui.html",
-                                "/swagger-ui/**",
-                                "/swagger-resources/**",
-                                "/webjars/**").permitAll()
-                        .anyRequest().authenticated());
+                .sessionManagement( customizer -> customizer.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        
+        // Configuración de rutas
+        if (enableSwagger) {
+            // Incluye rutas de Swagger si está habilitado
+            http.authorizeHttpRequests(authorizeRequests -> authorizeRequests
+                .requestMatchers(
+                    "/api/v1/authentication/**", 
+                    "/api/auth/authentication/**", 
+                    "/api/v1/authentication/sign-in",
+                    "/api/v1/authentication/sign-up",
+                    "/v3/api-docs/**",
+                    "/swagger-ui.html",
+                    "/swagger-ui/**",
+                    "/swagger-resources/**",
+                    "/webjars/**").permitAll()
+                .anyRequest().authenticated());
+        } else {
+            // Solo incluye rutas de autenticación si Swagger está deshabilitado
+            http.authorizeHttpRequests(authorizeRequests -> authorizeRequests
+                .requestMatchers(
+                    "/api/v1/authentication/**", 
+                    "/api/auth/authentication/**", 
+                    "/api/v1/authentication/sign-in",
+                    "/api/v1/authentication/sign-up").permitAll()
+                .anyRequest().authenticated());
+        }
+
+
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authorizationRequestFilter(), UsernamePasswordAuthenticationFilter.class);
         return http.build();
 
-    }
-
-    /**
-     * This is the constructor of the class.
-     * @param userDetailsService The user details service
-     * @param tokenService The token service
-     * @param hashingService The hashing service
-     * @param authenticationEntryPoint The authentication entry point
-     */
-    public WebSecurityConfiguration(@Qualifier("defaultUserDetailsService") UserDetailsService userDetailsService, BearerTokenService tokenService, BCryptHashingService hashingService, AuthenticationEntryPoint authenticationEntryPoint) {
-        this.userDetailsService = userDetailsService;
-        this.tokenService = tokenService;
-        this.hashingService = hashingService;
-        this.unauthorizedRequestHandler = authenticationEntryPoint;
     }
 }
