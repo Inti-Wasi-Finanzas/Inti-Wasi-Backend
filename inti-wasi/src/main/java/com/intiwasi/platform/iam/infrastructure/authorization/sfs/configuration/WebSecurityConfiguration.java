@@ -105,6 +105,7 @@ public class WebSecurityConfiguration {
                 .authorizeHttpRequests(authorizeRequests -> authorizeRequests
                         .requestMatchers(
                                 "/api/v1/authentication/**", //ultimo cambio
+                                "/api/auth/authentication/**", // para render
                                 "/api/v1/authentication/sign-in",
                                 "/api/v1/authentication/sign-up",
                                 "/v3/api-docs/**",
