@@ -2,21 +2,26 @@
 FROM eclipse-temurin:25-jdk AS build
 WORKDIR /app
 
-# Copiamos todo el proyecto
+# Copiamos todo el repo
 COPY . .
 
-# Usamos el wrapper de Maven para compilar (lo mismo que ./mvnw clean package -DskipTests)
+# Nos movemos a la carpeta donde está el pom.xml y mvnw
+WORKDIR /app/inti-wasi
+
+# Damos permiso de ejecución al wrapper de Maven
 RUN chmod +x mvnw || true
+
+# Compilamos el proyecto (sin tests)
 RUN ./mvnw clean package -DskipTests
 
 # ===== Etapa de runtime =====
 FROM eclipse-temurin:25-jre AS runtime
 WORKDIR /app
 
-# Copiamos el JAR generado
-COPY --from=build /app/target/*.jar app.jar
+# Copiamos el JAR generado desde la carpeta del proyecto
+COPY --from=build /app/inti-wasi/target/*.jar app.jar
 
-# Render usará esta app como servicio web (Spring Boot expone HTTP en este puerto)
+# Puerto que usa Spring Boot
 EXPOSE 8080
 
 # Comando de arranque
