@@ -2,7 +2,7 @@
 FROM eclipse-temurin:25-jdk AS build
 WORKDIR /app
 
-# Copiamos todo el repo
+# Copiamos todo el repositorio
 COPY . .
 
 # Nos movemos a la carpeta donde está el pom.xml y mvnw
